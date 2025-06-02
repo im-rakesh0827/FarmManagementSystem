@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, RegisterRequest } from '@shared/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -22,7 +23,13 @@ export class RegisterComponent {
   error = '';
   success = '';
 
-  constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private router: Router) {}
+
+  
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
 
   register() {
     this.success = '';

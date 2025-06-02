@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, LoginRequest, AuthResponse } from '@shared/services/auth.service';
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   model: LoginRequest = {
     email: '',
     password: ''
@@ -22,7 +22,27 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  login() {
+  /**
+   * Redirect to dashboard if already logged in
+   */
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  goToRegister() {
+  this.router.navigate(['/register']);
+  }
+  
+  forgotPassword() {
+    this.router.navigate(['/forgot-password'])
+  }
+
+  /**
+   * Handle login
+   */
+  login(): void {
     this.error = '';
     this.success = '';
     console.log('📦 Sending login request:', this.model);
@@ -32,7 +52,7 @@ export class LoginComponent {
         this.success = '✅ Login successful.';
         console.log('🎉 Auth success:', response);
 
-        // Save token to local storage
+        // Store auth data in localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);

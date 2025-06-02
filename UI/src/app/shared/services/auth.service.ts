@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '@environments/environment';
-
 
 // Interfaces
 export interface RegisterRequest {
@@ -29,16 +28,15 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-     // private apiUrl = 'http://localhost:5254/api/auth'; 
-     private apiUrl = `${environment.apiBaseUrl}/api/auth`;
-     
-     constructor(private http: HttpClient) {}
+  private apiUrl = `${environment.apiBaseUrl}/api/auth`;
+  private authStatus = new BehaviorSubject<boolean>(this.hasToken());
+
+  constructor(private http: HttpClient) {}
 
   /**
    * Register a new user
    */
   register(request: RegisterRequest): Observable<any> {
-    console.log('🔧 AuthService: Register request:', request);
     return this.http.post<any>(`${this.apiUrl}/register`, request).pipe(
       tap(() => console.log('✅ Registered successfully')),
       catchError(this.handleError)
@@ -46,23 +44,70 @@ export class AuthService {
   }
 
   /**
-   * Login an existing user
+   * Login user and store token + user info
    */
   login(request: LoginRequest): Observable<AuthResponse> {
-    console.log('🔧 AuthService: Login request:', request);
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
-      tap(response => console.log('✅ Logged in as:', response.email)),
+      tap(response => {
+        console.log('✅ Logged in as:', response.email);
+        localStorage.setItem('auth_token', response.token);
+        localStorage.setItem('auth_user', JSON.stringify(response));
+        this.authStatus.next(true);
+      }),
       catchError(this.handleError)
     );
   }
 
   /**
-   * Handle HTTP Errors
+   * Logout user
+   */
+  logout(): void {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    this.authStatus.next(false);
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.hasToken();
+  }
+
+  /**
+   * Observable for nav bar etc.
+   */
+  getAuthStatus(): Observable<boolean> {
+    return this.authStatus.asObservable();
+  }
+
+  /**
+   * Get current user info
+   */
+  getUser(): AuthResponse | null {
+    const user = localStorage.getItem('auth_user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  /**
+   * Get user role
+   */
+  getRole(): string | null {
+    return this.getUser()?.role ?? null;
+  }
+
+  /**
+   * Internal token check
+   */
+  private hasToken(): boolean {
+    return !!localStorage.getItem('auth_token');
+  }
+
+  /**
+   * Error handler
    */
   private handleError(error: HttpErrorResponse) {
     console.error('❌ AuthService Error:', error);
-    return throwError(() =>
-      error.error?.message || 'An unknown error occurred. Please try again.'
-    );
+    return throwError(() => error.error?.message || 'An unknown error occurred.');
   }
 }

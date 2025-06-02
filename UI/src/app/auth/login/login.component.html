@@ -11,8 +11,8 @@
           <button type="submit">Login</button>
 
           <div class="links">
-               <a routerLink="/register">Don't have an account? Register</a>
-               <a routerLink="/forgot-password">Forgot Password?</a>
+               <a (click)="goToRegister()">Don't have an account? Register</a>
+               <a (click)="forgotPassword()">Forgot Password?</a>
           </div>
 
           <div *ngIf="success" class="success-message">{{ success }}</div>

@@ -1,0 +1,20 @@
+<nav *ngIf="isLoggedIn" class="navbar">
+     <div class="logo">FarmSystem</div>
+
+     <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle navigation menu">
+          <span class="hamburger"></span>
+          <span class="hamburger"></span>
+          <span class="hamburger"></span>
+     </button>
+
+     <ul [class.open]="isMenuOpen" class="nav-links">
+          <li><a routerLink="/" routerLinkActive="active" (click)="closeMenu()">Home</a></li>
+          <li><a routerLink="/cows" routerLinkActive="active" (click)="closeMenu()">Cows</a></li>
+          <li><a routerLink="/milk" routerLinkActive="active" (click)="closeMenu()">Milk</a></li>
+          <li><a routerLink="/sales" routerLinkActive="active" (click)="closeMenu()">Sales</a></li>
+          <li><a routerLink="/inventory" routerLinkActive="active" (click)="closeMenu()">Inventory</a></li>
+          <li><a routerLink="/employees" routerLinkActive="active" (click)="closeMenu()">Employees</a></li>
+          <li><a routerLink="/reports" routerLinkActive="active" (click)="closeMenu()">Reports</a></li>
+          <li><a (click)="logout()" class="logout-link">Logout</a></li>
+     </ul>
+</nav>
