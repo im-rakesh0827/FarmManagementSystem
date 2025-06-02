@@ -1,0 +1,66 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+  width: 100vw;  /* Full viewport width */
+  justify-content: center; /* Vertical center */
+  align-items: center;     /* Horizontal center */
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px; /* max width for large screens */
+  height: 90vh;       /* almost full height but with some padding */
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 20px;
+  overflow: auto; /* scroll if content is taller */
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-input {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 15px;
+}
+
+.no-data {
+  margin-top: 20px;
+  font-style: italic;
+  color: gray;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Make table fill container and be responsive */
+table {
+  width: 100%;
+  min-width: 600px;
+  overflow-x: auto;
+}
+
+/* Responsive: For small screens, allow horizontal scrolling */
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+  }
+  table {
+    min-width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+

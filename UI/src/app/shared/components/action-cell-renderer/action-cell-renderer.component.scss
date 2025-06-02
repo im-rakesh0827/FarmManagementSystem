@@ -1,0 +1,7 @@
+.action-buttons {
+  display: flex;
+  align-items: center;       // ✅ Vertical centering
+  justify-content: center;   // Optional: horizontal centering
+  gap: 8px;                  // Optional: spacing between buttons
+  height: 100%;              // Important to take up full cell height
+}
