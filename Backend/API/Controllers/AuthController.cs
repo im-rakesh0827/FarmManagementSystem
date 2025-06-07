@@ -102,5 +102,118 @@ namespace FarmSystem.API.Controllers
         var users = await _userRepository.GetAllUsersAsync();
         return Ok(users);
     }
+
+
+
+/*
+[HttpPost("forgot-password")]
+public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+{
+    var user = await _userRepository.GetByEmailAsync(request.Email);
+    if (user == null)
+        return NotFound(new { message = "User not found" });
+
+    var token = Guid.NewGuid().ToString();
+    var expiry = DateTime.UtcNow.AddMinutes(15);
+
+    await _userRepository.SaveResetTokenAsync(user.Email, token, expiry);
+
+    // Log or email the token (in production: email)
+    Console.WriteLine($"🔐 Reset Token: {token}");
+
+    return Ok(new { message = "Reset token generated. Please check your email." });
+}
+
+[HttpPost("reset-password")]
+public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+{
+    var isValid = await _userRepository.VerifyResetTokenAsync(request.Email, request.Token);
+    if (!isValid)
+        return BadRequest(new { message = "Invalid or expired reset token." });
+
+    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+    var updated = await _userRepository.UpdatePasswordAsync(request.Email, hashedPassword);
+
+    return updated
+        ? Ok(new { message = "Password has been reset successfully." })
+        : StatusCode(500, new { message = "Failed to update password." });
+}
+*/
+
+
+
+
+
+
+
+[HttpPost("request-otp")]
+public async Task<IActionResult> RequestOtp([FromBody] EmailDto request)
+{
+    if (string.IsNullOrWhiteSpace(request.Email))
+        return BadRequest(new { message = "Email is required." });
+    var user = await _userRepository.GetByEmailAsync(request.Email);
+    if (user == null)
+    {
+        Console.WriteLine("User not found for email: " + request.Email);
+        return NotFound(new { message = "User not found." });
+    }
+    var otp = new Random().Next(100000, 999999).ToString();
+    var expiry = DateTime.UtcNow.AddMinutes(10);
+    var success = await _userRepository.GenerateOtpAsync(request.Email, otp, expiry);
+
+    if (!success)
+        return StatusCode(500, new { message = "Failed to generate OTP. Please try again." });
+    // TODO: Send OTP via email (SMTP or Email service integration)
+    return Ok(new { message = "OTP sent to your email." });
+}
+
+
+
+[HttpPost("verify-otp")]
+public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
+{
+    try
+    {
+        var isValid = await _userRepository.VerifyOtpAsync(dto.Email, dto.Otp);
+        return isValid
+            ? Ok(new { message = "OTP verified." })
+            : BadRequest(new { message = "Invalid or expired OTP." });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Server error. Please check logs." });
+    }
+}
+
+
+
+   [HttpPost("reset-password-otp")]
+public async Task<IActionResult> ResetPasswordViaOtp([FromBody] ResetPasswordDto dto)
+{
+    try
+    {
+        // Get the user
+        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        if (user == null)
+            return BadRequest(new { message = "User not found." });
+
+        // Hash the new password
+        var hashed = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+        // Update the password
+        var success = await _userRepository.UpdatePasswordAsync(dto.Email, hashed);
+
+        return success
+            ? Ok(new { message = "Password reset successful." })
+            : BadRequest(new { message = "Password reset failed." });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Error] ResetPasswordViaOtp failed for {dto.Email}: {ex.Message}");
+        return StatusCode(500, new { message = "Server error. Please check logs." });
+    }
+}
+
+
     }
 }

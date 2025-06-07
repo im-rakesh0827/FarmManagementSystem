@@ -17,6 +17,7 @@ export interface LoginRequest {
   password: string;
 }
 
+
 export interface AuthResponse {
   token: string;
   role: string;
@@ -28,7 +29,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiBaseUrl}/api/auth`;
+  private baseUrl = `${environment.apiBaseUrl}/auth`;
   private authStatus = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private http: HttpClient) {}
@@ -37,7 +38,7 @@ export class AuthService {
    * Register a new user
    */
   register(request: RegisterRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, request).pipe(
+    return this.http.post<any>(`${this.baseUrl}/register`, request).pipe(
       tap(() => console.log('✅ Registered successfully')),
       catchError(this.handleError)
     );
@@ -47,7 +48,7 @@ export class AuthService {
    * Login user and store token + user info
    */
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
       tap(response => {
         console.log('✅ Logged in as:', response.email);
         localStorage.setItem('auth_token', response.token);
@@ -110,4 +111,18 @@ export class AuthService {
     console.error('❌ AuthService Error:', error);
     return throwError(() => error.error?.message || 'An unknown error occurred.');
   }
+
+
+  requestOtp(email: string) {
+    return this.http.post(`${this.baseUrl}/request-otp`, { email });
+  }
+
+verifyOtp(email: string, otp: string):Observable<any>  {
+  return this.http.post(`${this.baseUrl}/verify-otp`, { email, otp });
+}
+
+resetPasswordViaOtp(email: string, newPassword: string):Observable<any>  {
+  return this.http.post(`${this.baseUrl}/reset-password-otp`, { email, newPassword });
+}
+
 }
