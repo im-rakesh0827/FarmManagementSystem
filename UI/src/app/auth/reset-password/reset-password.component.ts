@@ -19,10 +19,16 @@ export class ResetPasswordComponent {
   success: string = '';
 
   constructor(private route: ActivatedRoute, private router: Router, private authService: AuthService) {
-    this.route.queryParams.subscribe(params => {
-      this.email = params['email'];
-    });
+  const navigation = this.router.getCurrentNavigation();
+  const state = navigation?.extras?.state as { email?: string };
+
+  this.email = state?.email || sessionStorage.getItem('resetPasswordEmail') || '';
+
+  if (!this.email) {
+    this.router.navigate(['/login']);
   }
+}
+
 
   resetPassword() {
     if (this.newPassword !== this.confirmPassword) {
@@ -33,7 +39,10 @@ export class ResetPasswordComponent {
     this.authService.resetPasswordViaOtp(this.email, this.newPassword).subscribe({
       next: () => {
         this.success = 'Password reset successful. You can now login.';
-        this.router.navigate(['/login']); // optional
+        sessionStorage.removeItem('resetPasswordEmail');
+        this.authService.resetOtpFlow();
+        this.authService.setCameFromLogin(true);
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.error = err.error?.message || 'Failed to reset password.';

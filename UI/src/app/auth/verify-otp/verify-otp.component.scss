@@ -1,0 +1,85 @@
+form {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.info-message {
+  font-size: 0.95rem;
+  color: #444;
+  background-color: #e3f2fd;
+  padding: 10px;
+  border-left: 4px solid #2196f3;
+  border-radius: 4px;
+  margin-bottom: 1.2rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #555;
+  font-weight: 600;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #1976d2;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #1565c0;
+}
+
+.timer,
+.resend-container {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+.resend-link {
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.resend-link:hover {
+  color: #0d47a1;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+}

@@ -7,7 +7,12 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { VerifyOtpComponent } from './auth/verify-otp/verify-otp.component';
-import { authGuard } from './auth/auth.guard'; 
+import { authGuard } from './core/guards/auth.guard'; 
+import { unauthGuard } from './core/guards/unauth.guard';
+import { resetPasswordGuard } from './core/guards/reset-password.guard';
+import { verifyOtpGuard } from './core/guards/verify-otp.guard'
+import { forgotPasswordGuard} from './core/guards/forgot-password.guard'
+
 
 export const routes: Routes = [
   // Default route redirects to dashboard
@@ -16,16 +21,18 @@ export const routes: Routes = [
   // Auth routes
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-{ path: 'verify-otp', component: VerifyOtpComponent },
-{ path: 'reset-password', component: ResetPasswordComponent },
+
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [forgotPasswordGuard, unauthGuard] },
+{ path: 'verify-otp', component: VerifyOtpComponent, canActivate: [verifyOtpGuard, unauthGuard] },
+{ path: 'reset-password', component: ResetPasswordComponent, canActivate: [resetPasswordGuard, unauthGuard] },
+
 
 
   // Dashboard
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   // User management
-  { path: 'users', component: UserListComponent },
-  { path: 'users-grid', component: UserAgGridComponent },
+  { path: 'users', component: UserListComponent, canActivate: [authGuard] },
+  { path: 'users-grid', component: UserAgGridComponent, canActivate: [authGuard] },
 
   // Wildcard route
   { path: '**', redirectTo: 'dashboard' },

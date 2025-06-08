@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@shared/services/auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthFlowService } from '@shared/services/auth-flow.service';
 
 @Component({
   selector: 'app-verify-otp',
@@ -11,33 +12,37 @@ import { Router } from '@angular/router';
   templateUrl: './verify-otp.component.html',
   styleUrls: ['./verify-otp.component.scss']
 })
-export class VerifyOtpComponent {
+export class VerifyOtpComponent implements OnInit {
   email = '';
   otp = '';
   success = '';
   error = '';
-  showOtpInput = false;
-  isEmailSent = false;
   countdown = 10;
   timer: any;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private authFlowService: AuthFlowService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
-  sendOtp() {
-    this.authService.requestOtp(this.email).subscribe({
-      next: () => {
-        this.success = 'OTP sent to your email.';
-        this.error = '';
-        this.isEmailSent = true;
-        this.showOtpInput = true;
-        this.startTimer();
-      },
-      error: () => {
-        this.error = 'Failed to send OTP.';
-        this.success = '';
-      }
-    });
-  }
+
+  ngOnInit(): void {
+  this.route.queryParams.subscribe(() => {
+    // Try to get email from navigation state or sessionStorage
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state as { email?: string };
+    this.email = state?.email || sessionStorage.getItem('resetPasswordEmail') || '';
+    if (this.email) {
+      this.startTimer();
+    } else {
+      this.error = 'Email is missing. Cannot verify OTP.';
+      // Optionally redirect user to login
+      this.router.navigate(['/login']);
+    }
+  });
+}
 
   startTimer() {
     this.countdown = 10;
@@ -50,7 +55,22 @@ export class VerifyOtpComponent {
   }
 
   resendOtp() {
-    this.sendOtp();
+    if (!this.email) {
+      this.error = 'Email not found. Cannot resend OTP.';
+      return;
+    }
+
+    this.authService.requestOtp(this.email).subscribe({
+      next: () => {
+        this.success = 'OTP resent successfully.';
+        this.error = '';
+        this.startTimer();
+      },
+      error: () => {
+        this.error = 'Failed to resend OTP.';
+        this.success = '';
+      }
+    });
   }
 
   getMaskedEmail(): string {
@@ -64,12 +84,20 @@ export class VerifyOtpComponent {
   }
 
   verifyOtp() {
+    if (!this.email || !this.otp) {
+      this.error = 'Email or OTP is missing.';
+      return;
+    }
+
     this.authService.verifyOtp(this.email, this.otp).subscribe({
       next: () => {
-        this.router.navigate(['/reset-password'], { queryParams: { email: this.email } });
+        this.success = '';
+        this.error = '';
+        this.authFlowService.markOtpVerified();
+        this.router.navigate(['/reset-password'], { state: { email: this.email } });
       },
       error: () => {
-        this.error = 'Invalid OTP.';
+        this.error = 'Invalid OTP or OTP expired.';
         this.success = '';
       }
     });

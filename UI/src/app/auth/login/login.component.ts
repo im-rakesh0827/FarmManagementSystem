@@ -29,6 +29,9 @@ export class LoginComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     }
+    else {
+        this.authService.setCameFromLogin(true);
+    }
   }
 
   goToRegister() {
@@ -36,6 +39,8 @@ export class LoginComponent implements OnInit {
   }
   
   forgotPassword() {
+    this.authService.resetOtpFlow(); // clear previous flow
+  this.authService.setCameFromLogin(true);
     this.router.navigate(['/forgot-password']);
   }
 
