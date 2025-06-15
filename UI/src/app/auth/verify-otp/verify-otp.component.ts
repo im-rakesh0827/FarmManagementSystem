@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '@shared/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthFlowService } from '@shared/services/auth-flow.service';
+import { LoaderService } from '@shared/services/loader.service';
 
 @Component({
   selector: 'app-verify-otp',
@@ -24,7 +25,8 @@ export class VerifyOtpComponent implements OnInit {
     private authService: AuthService,
     private authFlowService: AuthFlowService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private loaderService: LoaderService
   ) {}
 
 
@@ -59,14 +61,16 @@ export class VerifyOtpComponent implements OnInit {
       this.error = 'Email not found. Cannot resend OTP.';
       return;
     }
-
+    this.loaderService.show();
     this.authService.requestOtp(this.email).subscribe({
       next: () => {
+        this.loaderService.hide();
         this.success = 'OTP resent successfully.';
         this.error = '';
         this.startTimer();
       },
       error: () => {
+        this.loaderService.hide();
         this.error = 'Failed to resend OTP.';
         this.success = '';
       }
@@ -88,15 +92,18 @@ export class VerifyOtpComponent implements OnInit {
       this.error = 'Email or OTP is missing.';
       return;
     }
+    this.loaderService.show();
 
     this.authService.verifyOtp(this.email, this.otp).subscribe({
       next: () => {
+        this.loaderService.hide();
         this.success = '';
         this.error = '';
         this.authFlowService.markOtpVerified();
         this.router.navigate(['/reset-password'], { state: { email: this.email } });
       },
       error: () => {
+        this.loaderService.hide();
         this.error = 'Invalid OTP or OTP expired.';
         this.success = '';
       }

@@ -2,16 +2,14 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '@shared/services/user.service';
 import { User } from '@shared/models/user.model';
-
-import { MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource , MatTableModule} from '@angular/material/table';
+import { LoaderService } from '@shared/services/loader.service';
 
 @Component({
   selector: 'app-user-list',
@@ -39,15 +37,18 @@ export class UserListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private loaderService: LoaderService) {}
 
   ngOnInit(): void {
+    this.loaderService.show();
     this.userService.getAllUsers().subscribe({
       next: (data) => {
+        this.loaderService.hide();
         this.dataSource.data = data;
         this.isLoading = false;
       },
       error: (err) => {
+        this.loaderService.hide();
         this.error = 'Failed to fetch users.';
         this.isLoading = false;
       }

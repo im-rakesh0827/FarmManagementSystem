@@ -15,6 +15,17 @@
           <li><a routerLink="/inventory" routerLinkActive="active" (click)="closeMenu()">Inventory</a></li>
           <li><a routerLink="/employees" routerLinkActive="active" (click)="closeMenu()">Employees</a></li>
           <li><a routerLink="/reports" routerLinkActive="active" (click)="closeMenu()">Reports</a></li>
-          <li><a (click)="logout()" class="logout-link">Logout</a></li>
+
+          <!-- Settings Dropdown -->
+          <li class="dropdown" (mouseenter)="showSettingsDropdown = true" (mouseleave)="showSettingsDropdown = false">
+               <a class="settings-link">
+                    ⚙️ Settings
+               </a>
+               <ul class="dropdown-menu" *ngIf="showSettingsDropdown">
+                    <li><a routerLink="/setting/profile" (click)="closeMenu()">Profile</a></li>
+                    <li><a (click)="logout()">Logout</a></li>
+               </ul>
+          </li>
      </ul>
+
 </nav>

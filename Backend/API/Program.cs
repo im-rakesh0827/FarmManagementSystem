@@ -3,8 +3,15 @@ using FarmSystem.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FarmSystem.API.Services;
+using FarmSystem.Core.Models;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
+builder.Services.AddSingleton<IConfiguration>(configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -37,6 +44,13 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICowRepository, CowRepository>();
+
+
+builder.Services.Configure<EmailSettings>(configuration.GetSection("SmtpSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailTemplateRepository, EmailTemplateRepository>();
+
 
 // JWT Setup
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

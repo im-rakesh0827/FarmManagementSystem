@@ -1,0 +1,25 @@
+.profile-card {
+  max-width: 400px;
+  margin: 3rem auto;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-card p {
+  font-size: 16px;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
+}

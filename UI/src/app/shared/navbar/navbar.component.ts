@@ -13,6 +13,7 @@ import { AuthService } from '@shared/services/auth.service'; // adjust the path 
 export class NavbarComponent implements OnInit {
   isMenuOpen = false;
   isLoggedIn = false;
+  showSettingsDropdown = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -29,6 +30,8 @@ export class NavbarComponent implements OnInit {
 
   closeMenu(): void {
     this.isMenuOpen = false;
+    this.showSettingsDropdown = false;
+
   }
 
   logout(): void {

@@ -5,17 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="dashboard">
-      <h2>Welcome to FarmSystem Dashboard 🌿</h2>
-      <p>This is your main control panel.</p>
-    </div>
-  `,
-  styles: [`
-    .dashboard {
-      padding: 2rem;
-      text-align: center;
-    }
-  `]
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {}

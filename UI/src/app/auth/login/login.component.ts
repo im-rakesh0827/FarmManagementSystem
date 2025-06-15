@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, LoginRequest, AuthResponse } from '@shared/services/auth.service';
 import { Router } from '@angular/router';
-
+import { LoaderService } from '@shared/services/loader.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -20,7 +20,10 @@ export class LoginComponent implements OnInit {
   error = '';
   success = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private loaderService: LoaderService) { }
 
   /**
    * Redirect to dashboard if already logged in
@@ -51,9 +54,10 @@ export class LoginComponent implements OnInit {
     this.error = '';
     this.success = '';
     console.log('📦 Sending login request:', this.model);
-
+    this.loaderService.show(); // Show loader before API call
     this.authService.login(this.model).subscribe({
       next: (response: AuthResponse) => {
+        this.loaderService.hide();
         this.success = '✅ Login successful.';
         console.log('🎉 Auth success:', response);
 
@@ -67,6 +71,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/dashboard']);
       },
       error: err => {
+        this.loaderService.hide();
         this.error = err.error?.message || '❌ Login failed.';
         console.error('Login error:', err);
       }

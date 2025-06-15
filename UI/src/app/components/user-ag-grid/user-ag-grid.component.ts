@@ -5,6 +5,7 @@ import { ColDef } from 'ag-grid-community';
 import { ModuleRegistry } from 'ag-grid-community';
 import { AllCommunityModule } from 'ag-grid-community'; // ✅ Use singular "Module"
 import { ActionCellRendererComponent } from '@shared/components/action-cell-renderer/action-cell-renderer.component';
+import { LoaderService } from '@shared/services/loader.service';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -34,15 +35,19 @@ export class UserAgGridComponent implements OnInit {
     resizable: true
   };
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, 
+    private loaderService: LoaderService) {}
 
   ngOnInit(): void {
+    this.loaderService.show();
     this.userService.getAllUsers().subscribe({
       next: (data) => {
+        this.loaderService.hide();
         this.rowData = data;
         this.setColumnDefs(); // ✅ Only call after data is ready
       },
       error: () => {
+        this.loaderService.hide();
         console.error('Failed to fetch users');
       }
     });

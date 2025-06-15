@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '@shared/services/auth.service';
 import { Router } from '@angular/router';
 import { AuthFlowService } from '@shared/services/auth-flow.service';
+import { LoaderService } from '@shared/services/loader.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -22,12 +23,18 @@ export class ForgotPasswordComponent {
   countdown = 30;
   timer: any;
 
-  constructor(private authService: AuthService, private authFlowService:AuthFlowService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private authFlowService: AuthFlowService,
+    private router: Router,
+    private loaderService: LoaderService) { }
 
   sendOtp() {
+    this.loaderService.show();
   this.authService.requestOtp(this.email).subscribe({
     next: () => {
       sessionStorage.setItem('resetPasswordEmail', this.email);
+      this.loaderService.hide();
       this.success = 'OTP sent to your email.';
       this.error = '';
       this.isEmailSent = true;
@@ -40,6 +47,7 @@ export class ForgotPasswordComponent {
 });
     },
     error: () => {
+      this.loaderService.hide();
       this.error = 'Failed to send OTP.';
       this.success = '';
     }
